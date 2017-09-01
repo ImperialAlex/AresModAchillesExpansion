@@ -9,6 +9,7 @@
 //	ARGUMENTS:
 //	_this select 0:		OBJECT	- unit that performs the para drop
 //  _this select 1:		SCALAR	- delay in seconds befor starting the air drop
+//	_this select 2:		SCALAR	- height in meters (AGL) when AI unit will deploy chute
 //
 //	RETURNS:
 //	nothing (procedure)
@@ -20,6 +21,7 @@
 
 _unit = _this select 0;
 _delay = _this select 1;
+_height = _this select 2;
 
 sleep _delay;
 
@@ -30,7 +32,11 @@ if (!isPlayer _unit) then
 	moveOut _unit;
 	unassignVehicle _unit;
 	[_unit] orderGetIn false;
-	sleep 1;
+	sleep 1;	
+	
+	// Wait until we have reached the deploy height
+	waitUntil { ((getPosAGL _unit) select 2) <= _height};
+	
 	
 	// if the unit already has a chute
 	if (backpack _unit != "" and {getText (configfile >> "CfgVehicles" >> backpack _unit >> "backpackSimulation") == "ParachuteSteerable"}) then
